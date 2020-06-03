@@ -219,3 +219,62 @@ void User::signUp() {
         break;
     }
 }
+
+void User::showInfo() {
+    string str;
+    int size = static_cast<int>(finfo.size());
+    int begin;  // begin定位到第一个未上映的电影下标
+    system("cls");
+    printf("                               ----------\n");
+    printf("                               | 信  息 |\n");
+    printf("                               ----------\n");
+    printf(
+        "------------------------------------------------------------------"
+        "----"
+        "---\n");
+    if (finfo.size() == 0) {
+        printf("没有电影信息\n");
+        printf("-----------任意键返回-----------");
+        getch();
+        return;
+    }
+    for (begin = 0; begin < size; begin++) {
+        if (finfo[begin].play == false) {
+            break;
+        }
+    }
+    if (begin == size) {  // 没有可供选择的电影时提示无信息
+        printf("没有电影信息\n");
+        printf("-----------任意键返回-----------");
+        getch();
+        return;
+    }
+    printf("%-8s%-20s\t", "编号", "电影名");
+    printf("%-13s%-10s", "日期", "时间");
+    printf("%-10s%-10s", "价格", "VIP折扣");
+    printf("%-10s\n", "剩余");
+
+    for (int i = begin; i < size; i++) {
+        str = to_string(i - begin + 1) + ".";
+        printf("%-5s", str.c_str());
+        str = "《" + finfo[i].moviename + "》";
+        printf("%-20s\t", str.c_str());
+        str = to_string(finfo[i].year) + "-" + to_string(finfo[i].month) + "-" +
+              to_string(finfo[i].day);
+        printf("%-11s", str.c_str());
+        str = to_string(finfo[i].hour) + ":";
+        if (finfo[i].minute == 0) {
+            str += "00";
+        } else {
+            str += to_string(finfo[i].minute);
+        }
+        printf("%-8s", str.c_str());
+        printf("%-8.1f", finfo[i].price);
+        printf("%-8.1f", finfo[i].sale);
+        printf("%d\n", finfo[i].rest);
+    }
+    printf(
+        "------------------------------------------------------------------"
+        "----"
+        "---\n");
+}

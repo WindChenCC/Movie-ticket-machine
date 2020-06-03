@@ -3,9 +3,9 @@
 #pragma once
 #include <string>
 
-#include "FilmsInfo.h"
+#include "InfoDeal.h"
 
-class User : public FilmsInfo {
+class User : public InfoDeal {
    private:
     std::string idName;
     std::string password;
@@ -13,6 +13,14 @@ class User : public FilmsInfo {
     void pwInput(std::string& str);
 
    public:
+    // 电影信息显示 用户版
+    void showInfo();
+    // 登陆
     void login();
+    // 注册
     void signUp();
+    // 订票
+    void book();
+    // 退票
+    void refund();
 };

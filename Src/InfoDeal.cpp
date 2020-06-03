@@ -26,8 +26,8 @@ bool InfoDeal::cmp(const FilmsInfo& a, const FilmsInfo& b) {
 
 InfoDeal::InfoDeal() {
     cout << "正在读取信息..." << endl;
+    fileRead();    
     Sleep(1000);
-    fileRead();
 }
 
 InfoDeal::~InfoDeal() {

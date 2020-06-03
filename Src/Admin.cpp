@@ -150,6 +150,8 @@ void Admin::add() {
 }
 
 void Admin::showInfo() {
+    string str;
+    int size = static_cast<int>(finfo.size());
     system("cls");
     printf("                               ----------\n");
     printf("                               | 信  息 |\n");
@@ -167,9 +169,7 @@ void Admin::showInfo() {
     printf("%-13s%-10s", "日期", "时间");
     printf("%-10s%-10s", "价格", "VIP折扣");
     printf("%-10s%-10s\n", "剩余", "状态");
-    string str;
-    int i = static_cast<int>(finfo.size());
-    for (i = 0; i < finfo.size(); i++) {
+    for (int i = 0; i < size; i++) {
         str = to_string(i + 1) + ".";
         printf("%-5s", str.c_str());
         str = "《" + finfo[i].moviename + "》";

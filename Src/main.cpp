@@ -12,8 +12,11 @@ using namespace std;
 
 int main() {
     system("chcp 65001");
-    
-    Admin admin;
-    admin.showInfo();
+    Menu menu;
+    char ch;
+    int choice;
+    menu.cover();
+    User user;
+    user.showInfo();
     cin.get();
 }
