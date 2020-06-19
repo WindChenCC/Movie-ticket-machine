@@ -42,13 +42,13 @@ void Admin::menuChoice() {
                 return;
             }
             case 1: {
-                add();
-                break;
-            }
-            case 2: {
                 showFInfo();
                 cout << "-----------任意键返回-----------\n";
                 getch();
+                break;
+            }
+            case 2: {
+                add();
                 break;
             }
             case 3: {
@@ -177,7 +177,7 @@ void Admin::change() {
         }
         FilmsInfo temp = deal.finfo[n];
         cout << "1. 电影名  2. 日期" << endl;
-        cout << "3. 时间    4. 价格" << endl;
+        cout << "3. 场次    4. 价格" << endl;
         cout << "5. 折扣" << endl;
         cout << "请选择修改的信息：";
         cin >> choice;
@@ -218,6 +218,8 @@ void Admin::change() {
         cout << "确认修改?(y/n)：";
         if (deal.yesOrNo()) {
             deal.finfo[n] = temp;
+            cout << "修改成功\n";
+            cout << "--------------------------------\n";
         } else {
             cout << "--取消修改--" << endl;
         }
@@ -315,7 +317,7 @@ void Admin::count() {
         dateSet.insert(strDate(*fit));
     }
     for (sit = dateSet.begin(); sit != dateSet.end(); sit++) {
-        mdate[i] = *sit;
+        mdate[i++] = *sit;
     }
     while (true) {
         system("cls");
@@ -359,7 +361,7 @@ void Admin::count() {
                 (fit->playNum == i)) {
                 cout << "电影《" << fit->name << "》\n";
                 cout << "已售：" << 100 - fit->rest;
-                cout << "  总价：" << fit->sumSales << "￥\n\n";
+                cout << "  销售额：" << fit->sumSales << "￥\n\n";
                 fit++;
             } else {
                 cout << "无电影\n\n";
@@ -371,13 +373,18 @@ void Admin::count() {
             string path;
             path = "statistics\\" + str + ".txt";
             ofstream oFile{path, ios::out | ios::trunc};
+            SYSTEMTIME st;
+            GetLocalTime(&st);
+            oFile << str << "统计结果 统计时间：";
+            oFile << st.wYear << "-" << st.wMonth << "-" << st.wDay << " ";
+            oFile << st.wHour << ":" << st.wMinute << ":" << st.wSecond << endl;
             for (i = 1; i <= 7; i++) {
                 oFile << "第" << i << "场次 " << mpnum[i] << " ";
                 if ((fit2 != deal.finfo.end()) && (strDate(*fit2) == str) &&
                     (fit2->playNum == i)) {
                     oFile << "电影《" << fit2->name << "》\n";
                     oFile << "已售：" << 100 - fit2->rest;
-                    oFile << " 总价：" << fit2->sumSales << "￥\n\n";
+                    oFile << " 销售额：" << fit2->sumSales << "￥\n\n";
                     fit2++;
                 } else {
                     oFile << "无电影\n\n";

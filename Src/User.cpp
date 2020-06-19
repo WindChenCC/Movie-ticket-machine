@@ -478,7 +478,7 @@ void User::book() {
                 ticPrice = ticPrice * deal.finfo[choice].discount / 10;
                 cout << "您开通了VIP，票价打" << deal.finfo[choice].discount
                      << "折\n";
-                cout << "票价：" << ticPrice << endl;
+                cout << "票价：" << ticPrice << "￥\n"; 
             }
         }
         cout << "是否支付(y/n)？：";
