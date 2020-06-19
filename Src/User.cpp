@@ -1,23 +1,28 @@
 // User.cpp
-// Created by cch on 2020/5/28.
+// Created by cch on 2020/6/17.
 #include "User.h"
 
 #include <conio.h>
 #include <io.h>
+#include <time.h>
 #include <windows.h>
 
+#include <algorithm>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <string>
+
+#include "Menu.h"
 using namespace std;
 
-void User::pwInput(string& str) {
+void User::pwInput(std::string& pw) {
     while (true) {
         char ch;
         ch = getch();
-        if (ch == 8) {
-            if (str.empty() == 0) {  // è¾“å…¥é€€æ ¼é”®æ—¶åˆ é™¤ä¸€ä¸ªå­—ç¬¦
-                str.pop_back();
+        if (ch == 8) {  // ÊäÈëÍË¸ñ¼üÊ±É¾³ıÒ»¸ö×Ö·û
+            if (!pw.empty()) {
+                pw.pop_back();
                 cout << "\b \b";
             }
             continue;
@@ -25,256 +30,603 @@ void User::pwInput(string& str) {
             cout << endl;
             break;
         } else {
-            str.push_back(ch);
+            pw.push_back(ch);
             cout << "*";
         }
     }
 }
 
-void User::login() {
-    string menu{
-        "            ---------\n"
-        "            | ç™» é™† |\n"
-        "            ---------\n"
-        "--------------------------------\n"};
-    cout << menu;
-    while (true) {
-        password.clear();
-        idName.clear();
-
-        cout << "è¯·è¾“å…¥ç”¨æˆ·åï¼š";
-        getline(cin, idName);
-        cout << "è¯·è¾“å…¥å¯†ç ï¼š";
-        pwInput(password);
-        if (idName == "admin" && password == "admin") {
-            cout << "æ¬¢è¿ç®¡ç†å‘˜adminï¼" << endl;
-            return;
-        }
-        if (_access(("users\\" + idName + ".txt").c_str(), 0) != 0) {
-            system("cls");
-            cout << menu;
-            cout << "  ç”¨æˆ·åæˆ–å¯†ç é”™è¯¯ï¼Œè¯·é‡æ–°è¾“å…¥" << endl;
-            cout << "--------------------------------" << endl;
-            continue;
-        } else {
-            ifstream iFile{"users\\" + idName + ".txt"};
-            string pw;
-            iFile >> pw >> pw;
-            if (password == pw) {
-                cout << "æ­£åœ¨ç™»é™†ï¼Œè¯·ç¨å";
-                Sleep(500);
-                for (int i = 0; i < 3; i++) {
-                    cout << ".";
-                    Sleep(500);
-                }
-                iFile.seekg(4, ios::cur);  // è·³è¿‡æ–‡ä»¶ä¸­çš„ VIP:
-                iFile >> vip;
-                cout << endl << "ç™»é™†æˆåŠŸï¼Œæ¬¢è¿";
-                if (vip) {
-                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
-                    cout << "vipç”¨æˆ·:";
-                    SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
-                }
-                cout << idName << endl;
-                cout << "-----------ä»»æ„é”®è·³è½¬-----------";
-                getch();
-                break;
-            } else {
-                system("cls");
-                cout << menu;
-                cout << "  ç”¨æˆ·åæˆ–å¯†ç é”™è¯¯ï¼Œè¯·é‡æ–°è¾“å…¥" << endl;
-                cout << "--------------------------------" << endl;
-                continue;
-            }
-        }
+bool User::membership() {
+    cout << "--------------------------------\n";
+    cout << "VIPÏíÊÜ¹ºÆ±ÓÅ»İ£¬ÖÕÉí½öĞè99£¤\n";
+    cout << "ÊÇ·ñ¿ªÍ¨ÖÕÉíVIP(y/n)?£º";
+    if (deal.yesOrNo()) {
+        cout << "µÈ´ıÖ§¸¶";
+        deal.wait();
+        cout << "\n--Ö§¸¶³É¹¦--\n";
+        cout << "¹§Ï²Äú³É¹¦ÎªÖÕÉíVIP£¬×£Äú¹ÛÓ°Óä¿ì£¡\n";
+        cout << "--------------------------------\n";
+        return true;
+    } else {
+        cout << "È¡Ïû¿ªÍ¨VIP£¬×£Äú¹ÛÓ°Óä¿ì£¡\n";
+        cout << "--------------------------------\n";
+        return false;
     }
 }
 
-void User::signUp() {
-    string id;
-    string path;
-    string repassword;
-    string menu{
-        "            ---------\n"
-        "            | æ³¨ å†Œ |\n"
-        "            ---------\n"
-        "--------------------------------\n"};
-    if (_access("users", 0) == -1) {
-        path = "md users";
-        system(path.c_str());
-    }
-    if (_access("films", 0) == -1) {
-        path = "md films";
-        system(path.c_str());
-    }
-    cout << menu;
-    while (true) {
-        password.clear();
-        repassword.clear();
-        cout << "è¯·è¾“å…¥æ³¨å†Œç”¨æˆ·å(ä¸åŒ…å«ç©ºæ ¼)" << endl;
-        cout << "ç”¨æˆ·åï¼š";
-        getline(cin, idName);
-        if (idName == "admin") {
-            system("cls");
-            cout << menu;
-            cout << " è¯¥ç”¨æˆ·åä¸å¯è¢«æ³¨å†Œï¼Œè¯·é‡æ–°è¾“å…¥" << endl;
-            cout << "--------------------------------" << endl;
-            continue;
-        }
-        if (idName.find(' ') != string::npos) {
-            system("cls");
-            cout << menu;
-            cout << " ç”¨æˆ·åä¸å¯åŒ…å«ç©ºæ ¼ï¼Œè¯·é‡æ–°è¾“å…¥" << endl;
-            cout << "--------------------------------" << endl;
-            continue;
-        }
-        if (idName.size() == 0) {
-            system("cls");
-            cout << menu;
-            cout << "   ç”¨æˆ·åä¸èƒ½ä¸ºç©ºï¼Œè¯·é‡æ–°è¾“å…¥" << endl;
-            cout << "--------------------------------" << endl;
-            continue;
-        }
-        id = idName;
-        idName += ".txt";
-        if (_access(("users\\" + idName).c_str(), 0) == 0) {
-            system("cls");
-            cout << menu;
-            cout << "   è¯¥ç”¨æˆ·åå·²å­˜åœ¨ï¼Œè¯·é‡æ–°è¾“å…¥" << endl;
-            cout << "--------------------------------" << endl;
-            continue;
-        }
-        cout << "è¾“å…¥å¯†ç (6ä½åŠä»¥ä¸Šä¸”ä¸åŒ…å«ç©ºæ ¼)" << endl;
-        cout << "å¯†ç ï¼š";
-        pwInput(password);
-        if (password.find(' ') != string::npos) {  // æ£€æµ‹å¯†ç æ˜¯å¦å¸¦ç©ºæ ¼
-            system("cls");
-            cout << menu;
-            cout << "  å¯†ç ä¸å¯åŒ…å«ç©ºæ ¼ï¼Œè¯·é‡æ–°è¾“å…¥" << endl;
-            cout << "--------------------------------" << endl;
-            continue;
-        }
-        if (password.size() < 6) {
-            system("cls");
-            cout << menu;
-            cout << " å¯†ç å¿…é¡»6ä½åŠä»¥ä¸Šï¼Œè¯·é‡æ–°è¾“å…¥" << endl;
-            cout << "--------------------------------" << endl;
-            continue;
-        }
-        cout << "è¯·å†æ¬¡è¾“å…¥å¯†ç " << endl;  // å¯†ç ç¡®è®¤
-        cout << "å¯†ç ï¼š";
-        pwInput(repassword);
-        if (password != repassword) {
-            system("cls");
-            cout << menu;
-            cout << "   ä¸¤æ¬¡å¯†ç ä¸ä¸€è‡´ï¼Œè¯·é‡æ–°è¾“å…¥" << endl;
-            cout << "--------------------------------" << endl;
-            continue;
-        }
-        cout << "æ­£åœ¨æ³¨å†Œï¼Œè¯·ç¨å";
-        Sleep(500);
-        for (int i = 0; i < 3; i++) {
-            cout << ".";
-            Sleep(500);
-        }
-        cout << endl << id << " æ³¨å†ŒæˆåŠŸï¼" << endl;
-
-        while (true) {
-            cout << "--------------------------------" << endl;
-            cout << "æ˜¯å¦å¼€é€šç»ˆèº«VIPï¼Œäº«å—è´­ç¥¨ä¼˜æƒ ?(y/n)" << endl;
-            Sleep(500);
-            cout << "æ³¨å†Œä¼˜æƒ ä»…éœ€80ï¿¥" << endl;
-            Sleep(500);
-            cout << "æ‚¨çš„é€‰æ‹©ï¼š";
-            char vchoic;
-            cin >> vchoic;
-            if (vchoic == 'y') {
-                cout << "ç­‰å¾…æ”¯ä»˜";
-                Sleep(500);
-                for (int i = 0; i < 3; i++) {
-                    cout << ".";
-                    Sleep(500);
-                }
-                vip = true;
-                cout << endl << "æ”¯ä»˜æˆåŠŸï¼" << endl;
-                cout << "æ­å–œæ‚¨æˆä¸ºç»ˆèº«VIPï¼Œç¥æ‚¨è§‚å½±æ„‰å¿«ï¼" << endl;
-                break;
-            } else if (vchoic == 'n') {
-                vip = false;
-                cout << "æ„Ÿè°¢æ‚¨çš„æ³¨å†Œï¼Œç¥æ‚¨è§‚å½±æ„‰å¿«ï¼" << endl;
-                break;
+void User::showSeat(const FilmsInfo& film) {
+    cout << "                         ---------" << endl;
+    cout << "                         | ÆÁ Ä» |" << endl;
+    cout << "                         ---------" << endl;
+    cout << "     01ÁĞ 02ÁĞ 03ÁĞ 04ÁĞ 05ÁĞ 06ÁĞ 07ÁĞ 08ÁĞ 09ÁĞ 10ÁĞ " << endl;
+    cout << "    ---------------------------------------------------" << endl;
+    for (int i = 0; i < 10; i++) {
+        for (int j = 0; j < 10; j++) {
+            if (j == 0) {
+                if (i != 9) cout << "0";
+                cout << i + 1 << "ÅÅ|";
+            }
+            if (film.seat[i][j] == true) {
+                cout << "[Âú]";
             } else {
-                system("cls");
-                cout << "--------------------------------" << endl;
-                cout << "       è¯·è¾“å…¥yæˆ–nè¿›è¡Œé€‰æ‹©" << endl;
-                continue;
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 2);
+                cout << "[¿Õ]";
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+            }
+            if ((2 <= i && i <= 5) && (1 <= j && j <= 7)) {
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
+                cout << "|";
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+            } else {
+                cout << "|";
             }
         }
-        ofstream oFile{"users\\" + idName};
-        oFile << "password: " << password << " ";
-        oFile << "VIP: " << vip << endl;
-        oFile.close();
-        cout << "-----------ä»»æ„é”®è¿”å›-----------";
-        getch();
-        break;
+        cout << endl;
+    }
+    cout << "    ---------------------------------------------------" << endl;
+}
+
+bool User::cmpTime(const Ticket& ticket) {
+    time_t tt;
+    time(&tt);
+    tt += 8 * 3600;
+    tm* t = gmtime(&tt);
+    if (ticket.year != (t->tm_year + 1900)) {
+        return (ticket.year < (t->tm_year + 1900));
+    } else if (ticket.month != (t->tm_mon + 1)) {
+        return (ticket.month < (t->tm_mon + 1));
+    } else if (ticket.day != t->tm_mday) {
+        return (ticket.day < t->tm_mday);
+    } else if (ticket.hour != t->tm_hour) {
+        return (ticket.hour < t->tm_hour);
+    } else {
+        return (ticket.minute < t->tm_min);
     }
 }
 
-void User::showInfo() {
-    string str;
-    int size = static_cast<int>(finfo.size());
-    int begin;  // beginå®šä½åˆ°ç¬¬ä¸€ä¸ªæœªä¸Šæ˜ çš„ç”µå½±ä¸‹æ ‡
-    system("cls");
-    printf("                               ----------\n");
-    printf("                               | ä¿¡  æ¯ |\n");
-    printf("                               ----------\n");
-    printf(
-        "------------------------------------------------------------------"
-        "----"
-        "---\n");
-    if (finfo.size() == 0) {
-        printf("æ²¡æœ‰ç”µå½±ä¿¡æ¯\n");
-        printf("-----------ä»»æ„é”®è¿”å›-----------");
-        getch();
+void User::userSave() {
+    string path = uinfo.idName;
+    path = "users\\" + path + ".dat";
+    ofstream oFile{path, ios::binary | ios::trunc};
+    sort(tic.begin(), tic.end(), tcmp);
+    if (!oFile) {
         return;
     }
+    oFile.write((char*)&uinfo, sizeof(UserInfo));
+    for (int i = 0; i < tic.size(); i++) {
+        if (cmpTime(tic[i])) {
+            tic[i].play = true;
+        } else {
+            tic[i].play = false;
+        }
+        oFile.write((char*)&tic[i], sizeof(Ticket));
+    }
+    oFile.close();
+}
+
+void User::userRead(string name) {
+    tic.clear();
+    string path = "users\\" + name + ".dat";
+    Ticket temp;
+    ifstream iFile{path, ios::binary | ios::in};
+    if (!iFile) {
+        return;
+    }
+    iFile.read((char*)&uinfo, sizeof(UserInfo));
+    iFile.read((char*)&temp, sizeof(Ticket));
+    while (!iFile.eof()) {
+        if (cmpTime(temp)) {
+            temp.play = true;
+        } else {
+            temp.play = false;
+        }
+        tic.push_back(temp);
+        iFile.read((char*)&temp, sizeof(Ticket));
+    }
+    iFile.close();
+}
+
+bool User::tcmp(const Ticket& a, const Ticket& b) {
+    if (a.year != b.year) {
+        return (a.year < b.year);
+    } else if (a.month != b.month) {
+        return (a.month < b.month);
+    } else if (a.day != b.day) {
+        return (a.day < b.day);
+    } else if (a.hour != b.hour) {
+        return (a.hour < b.hour);
+    } else {
+        return (a.minute < b.minute);
+    }
+}
+
+ostream& operator<<(ostream& os, const Ticket& ticket) {
+    string str;
+    os << setiosflags(ios::left);
+    str = "¡¶";
+    str += ticket.name;
+    str += "¡·";
+    os << setw(17) << str;
+
+    str = to_string(ticket.year) + "-";
+    if (ticket.month < 10) str += "0";
+    str += (to_string(ticket.month) + "-");
+    if (ticket.day < 10) str += "0";
+    str += to_string(ticket.day);
+    os << setw(12) << str;
+
+    str.clear();
+    if (ticket.hour < 10) str = "0";
+    str += (to_string(ticket.hour) + ":");
+    if (ticket.minute < 10) str += "0";
+    str += to_string(ticket.minute);
+    os << setw(7) << str;
+
+    os << setw(6) << ticket.playNum;
+    os.precision(1);
+    os.setf(os.showpoint | ios::fixed);
+    os << setw(6) << ticket.price;
+
+    str.clear();
+    if (ticket.seat[0] + 1 < 10) str = "0";
+    str += (to_string(ticket.seat[0] + 1) + "ÅÅ");
+    if (ticket.seat[1] + 1 < 10) str += "0";
+    str += (to_string(ticket.seat[1] + 1) + "×ù");
+    os << setw(10) << str;
+
+    if (ticket.play) {
+        os << setw(8) << "ÒÑÉÏÓ³" << endl;
+    } else {
+        os << setw(8) << "Î´ÉÏÓ³" << endl;
+    }
+    return os;
+}
+
+void User::menuChoice() {
+    char ch;
+    int choice;
+    Menu menu;
+    while (true) {
+        menu.userMenu();
+        cin >> ch;
+        cin.ignore();
+        choice = ch - 48;
+        switch (choice) {
+            case 0: {
+                return;
+            }
+            case 1: {
+                book();
+                break;
+            }
+            case 2: {
+                refund();
+                break;
+            }
+        }
+    }
+}
+
+int User::showFInfo() {
+    int begin;
+    int size = static_cast<int>(deal.finfo.size());
     for (begin = 0; begin < size; begin++) {
-        if (finfo[begin].play == false) {
+        if (deal.finfo[begin].play == false) {
             break;
         }
     }
-    if (begin == size) {  // æ²¡æœ‰å¯ä¾›é€‰æ‹©çš„ç”µå½±æ—¶æç¤ºæ— ä¿¡æ¯
-        printf("æ²¡æœ‰ç”µå½±ä¿¡æ¯\n");
-        printf("-----------ä»»æ„é”®è¿”å›-----------");
+    system("cls");
+    if (begin == size) {
+        cout << "µ±Ç°Ã»ÓĞ¿É¹ºÂòµçÓ°\n";
+        cout << "-----------ÈÎÒâ¼ü·µ»Ø-----------\n";
+        getch();
+        return -1;
+    }
+    deal.showFInfo(begin);
+    return begin;
+}
+
+void User::signUp() {
+    string menu{
+        "            ---------\n"
+        "            | ×¢ ²á |\n"
+        "            ---------\n"
+        "--------------------------------\n"};
+    string warning{"ÇëÖØĞÂÊäÈë\n--------------------------------\n"};
+    system("cls");
+    cout << menu;
+    while (true) {
+        string path;
+        string id;
+        string pw, repw;
+        cout << "£¨ÓÃ»§Ãû²»º¬¿Õ¸ñ£¬²»·Ö´óĞ¡Ğ´,0ÍË³ö£©\n";
+        cout << "ÇëÊäÈëÓÃ»§Ãû£º";
+        getline(cin, id);
+        if (id == "0") {
+            cout << "--ÍË³ö×¢²á--\n";
+            cout << "-----------ÈÎÒâ¼ü·µ»Ø-----------" << endl;
+            getch();
+            return;
+        }
+        if (id == "admin") {
+            system("cls");
+            cout << menu;
+            cout << " ¸ÃÓÃ»§Ãû²»¿É×¢²á£¬" << warning;
+            continue;
+        }
+        if (id.find(' ') != string::npos) {
+            system("cls");
+            cout << menu;
+            cout << " ÓÃ»§Ãû²»¿É°üº¬¿Õ¸ñ£¬" << warning;
+            continue;
+        }
+        path = "users\\" + id + ".dat";
+        if (_access(path.c_str(), 0) == 0) {
+            system("cls");
+            cout << menu;
+            cout << " ¸ÃÓÃ»§ÃûÒÑ´æÔÚ£¬" << warning;
+            continue;
+        }
+        cout << "£¨ÃÜÂë6Î»¼°ÒÔÉÏÇÒ²»º¬¿Õ¸ñ£©\n";
+        cout << "ÇëÊäÈëÃÜÂë£º";
+        pwInput(pw);
+        if (pw.find(' ') != string::npos) {
+            system("cls");
+            cout << menu;
+            cout << "  ÃÜÂë²»¿É°üº¬¿Õ¸ñ£¬" << warning;
+            continue;
+        }
+        if (pw.size() < 6) {
+            system("cls");
+            cout << menu;
+            cout << " ÃÜÂë±ØĞë6Î»¼°ÒÔÉÏ£¬" << warning;
+            continue;
+        }
+        cout << "ÇëÔÙ´ÎÊäÈëÃÜÂë£º";  // ÃÜÂëÈ·ÈÏ
+        pwInput(repw);
+        if (pw != repw) {
+            system("cls");
+            cout << menu;
+            cout << "   Á½´ÎÃÜÂë²»Ò»ÖÂ£¬" << warning;
+            continue;
+        }
+        cout << "ÕıÔÚ×¢²á£¬ÇëÉÔºó";
+        deal.wait();
+        cout << endl << id << " ×¢²á³É¹¦£¡" << endl;
+        uinfo.vip = membership();
+        strcpy(uinfo.idName, id.c_str());
+        strcpy(uinfo.password, pw.c_str());
+
+        ofstream oFile{path, ios::binary | ios::trunc};
+        oFile.write((char*)&uinfo, sizeof(UserInfo));
+        oFile.close();
+        cout << "-----------ÈÎÒâ¼ü·µ»Ø-----------" << endl;
         getch();
         return;
     }
-    printf("%-8s%-20s\t", "ç¼–å·", "ç”µå½±å");
-    printf("%-13s%-10s", "æ—¥æœŸ", "æ—¶é—´");
-    printf("%-10s%-10s", "ä»·æ ¼", "VIPæŠ˜æ‰£");
-    printf("%-10s\n", "å‰©ä½™");
+}
 
-    for (int i = begin; i < size; i++) {
-        str = to_string(i - begin + 1) + ".";
-        printf("%-5s", str.c_str());
-        str = "ã€Š" + finfo[i].moviename + "ã€‹";
-        printf("%-20s\t", str.c_str());
-        str = to_string(finfo[i].year) + "-" + to_string(finfo[i].month) + "-" +
-              to_string(finfo[i].day);
-        printf("%-11s", str.c_str());
-        str = to_string(finfo[i].hour) + ":";
-        if (finfo[i].minute == 0) {
-            str += "00";
-        } else {
-            str += to_string(finfo[i].minute);
+string User::login() {
+    string menu{
+        "            ---------\n"
+        "            | µÇ Â½ |\n"
+        "            ---------\n"
+        "--------------------------------\n"};
+    system("cls");
+    cout << menu;
+    while (true) {
+        string id;
+        string pw;
+        string path;
+        cout << "ÇëÊäÈëÓÃ»§Ãû(0ÍË³ö)£º";
+        getline(cin, id);
+        if (id == "0") {
+            cout << "--ÍË³öµÇÂ½--\n";
+            cout << "-----------ÈÎÒâ¼ü·µ»Ø-----------" << endl;
+            getch();
+            return string{"-1"};
         }
-        printf("%-8s", str.c_str());
-        printf("%-8.1f", finfo[i].price);
-        printf("%-8.1f", finfo[i].sale);
-        printf("%d\n", finfo[i].rest);
+        cout << "ÇëÊäÈëÃÜÂë£º";
+        pwInput(pw);
+        if (id == "admin" && pw == "admin") {
+            cout << "ÕıÔÚµÇÂ½£¬ÇëÉÔºó";
+            deal.wait();
+            cout << "\n»¶Ó­¹ÜÀíÔ±admin!" << endl;
+            cout << "-----------ÈÎÒâ¼üÌø×ª-----------" << endl;
+            getch();
+            return string{"admin"};
+        }
+        path = "users\\" + id + ".dat";
+        if (_access(path.c_str(), 0) != 0) {
+            system("cls");
+            cout << menu;
+            cout << " ÓÃ»§Ãû»òÃÜÂë´íÎó\n";
+            cout << "--------------------------------\n";
+            continue;
+        }
+        ifstream iFile{path.c_str(), ios::binary | ios::in};
+        iFile.read((char*)&uinfo, sizeof(UserInfo));
+        if (strcmp(pw.c_str(), uinfo.password) == 0) {
+            iFile.close();
+            cout << "ÕıÔÚµÇÂ½£¬ÇëÉÔºó";
+            deal.wait();
+            cout << "\n»¶Ó­";
+            if (uinfo.vip) {
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 4);
+                cout << "VIP";
+                SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 7);
+            }
+            cout << "ÓÃ»§£º" << id << endl;
+            cout << "-----------ÈÎÒâ¼üÌø×ª-----------" << endl;
+            getch();
+            userRead(id);
+            return id;
+        } else {
+            iFile.close();
+            system("cls");
+            cout << menu;
+            cout << " ÓÃ»§Ãû»òÃÜÂë´íÎó\n";
+            cout << "--------------------------------\n";
+            continue;
+        }
     }
-    printf(
-        "------------------------------------------------------------------"
-        "----"
-        "---\n");
+}
+
+void User::book() {
+    int x, y;
+    int seat[2]{-1, -1};
+    int begin;
+    int choice;
+    int size = static_cast<int>(deal.finfo.size());
+    bool isBest = false;
+    double ticPrice;
+
+    // for (begin = 0; begin < size; begin++) {
+    //     if (deal.finfo[begin].play == false) {
+    //         break;
+    //     }
+    // }
+    // system("cls");
+    // if (begin == size) {
+    //     cout << "µ±Ç°Ã»ÓĞ¿É¹ºÂòµçÓ°\n";
+    //     cout << "-----------ÈÎÒâ¼ü·µ»Ø-----------\n";
+    //     getch();
+    //     return;
+    // }
+    // deal.showFInfo(begin);
+    begin = showFInfo();
+    if (begin == -1) return;
+    while (true) {
+        cout << "ÇëÊäÈëµçÓ°±àºÅ(0ÍË³ö)£º";
+        cin >> choice;
+        if (choice == 0) {
+            cout << "--ÍË³ö¹ºÆ±--\n";
+            cout << "-----------ÈÎÒâ¼ü·µ»Ø-----------\n";
+            getch();
+            return;
+        }
+        choice = choice + begin - 1;
+        if (choice < begin || choice > size) {
+            cout << "±àºÅ²»´æÔÚ£¬ÇëÖØĞÂÊäÈë\n";
+            continue;
+        }
+        if (deal.finfo[choice].rest == 0) {
+            cout << "´ËµçÓ°ÒÑÂú×ù£¬ÇëÑ¡ÔñÆäËûµçÓ°\n";
+            continue;
+        }
+        break;
+    }
+    showSeat(deal.finfo[choice]);
+    cout << "ºìÉ«ÇøÓòÎª×î¼Ñ¹ÛÓ°Çø£¬Ğë¶àÖ§¸¶20%\n";
+    while (true) {
+        cout << "ÊÇ·ñ¼ÌĞøÑ¡×ù(y/n)£º";
+        if (!deal.yesOrNo()) {
+            cout << "--ÍË³öÑ¡×ù--\n";
+            break;
+        }
+        cout << "ÇëÑ¡Ôñ×ùÎ»(1 1)£º";
+        cin >> x >> y;
+        cin.ignore();
+        x--;
+        y--;
+        if (x < 0 || x > 9 || y < 0 || y > 9) {
+            cout << "×ùÎ»²»´æÔÚ\n";
+            continue;
+        } else if (deal.finfo[choice].seat[x][y] == true) {
+            cout << "´Ë×ùÒÑÊÛ£¬ÇëÑ¡ÔñÆäËû×ùÎ»\n";
+            continue;
+        }
+        // ÊÇ·ñ×î¼Ñ¹ÛÓ°Çø
+        if (x >= 2 && x <= 5 && y >= 2 && y <= 7) {
+            isBest = true;
+            cout << "ÄúÑ¡µÄÎª " << x + 1 << "ÅÅ" << y + 1
+                 << "×ù£¬ÊÇ×î¼Ñ¹ÛÓ°Çø£¬Ğë¶àÖ§¸¶20%" << endl;
+            ticPrice = deal.finfo[choice].price * 1.2;
+        } else {
+            isBest = false;
+            cout << "ÄúÑ¡µÄÎª " << x + 1 << "ÅÅ" << y + 1 << "×ù\n";
+            ticPrice = deal.finfo[choice].price;
+        }
+        if (uinfo.vip) {
+            ticPrice = ticPrice * deal.finfo[choice].discount / 10;
+            cout << "ÄúÎªVIPÓÃ»§£¬Æ±¼Û´ò" << deal.finfo[choice].discount
+                 << "ÕÛ\n";
+        }
+        cout << "Æ±¼Û£º" << ticPrice << endl;
+        if (!uinfo.vip) {
+            uinfo.vip = membership();
+            if (uinfo.vip) {
+                ticPrice = ticPrice * deal.finfo[choice].discount / 10;
+                cout << "Äú¿ªÍ¨ÁËVIP£¬Æ±¼Û´ò" << deal.finfo[choice].discount
+                     << "ÕÛ\n";
+                cout << "Æ±¼Û£º" << ticPrice << endl;
+            }
+        }
+        cout << "ÊÇ·ñÖ§¸¶(y/n)£¿£º";
+        if (deal.yesOrNo()) {
+            cout << "µÈ´ıÖ§¸¶";
+            deal.wait();
+            cout << "\nÖ§¸¶³É¹¦!\n";
+
+            Ticket temp;
+            deal.finfo[choice].seat[x][y] = true;
+            deal.finfo[choice].rest--;
+            deal.finfo[choice].sumSales += ticPrice;
+            strcpy(temp.name, deal.finfo[choice].name);
+            temp.year = deal.finfo[choice].year;
+            temp.month = deal.finfo[choice].month;
+            temp.day = deal.finfo[choice].day;
+            temp.hour = deal.finfo[choice].hour;
+            temp.minute = deal.finfo[choice].minute;
+            temp.playNum = deal.finfo[choice].playNum;
+            temp.seat[0] = x;
+            temp.seat[1] = y;
+            temp.price = ticPrice;
+            temp.isBest = isBest;
+            tic.push_back(temp);
+            printTicket(temp);
+            deal.filmSave();
+            userSave();
+        } else {
+            cout << "--È¡ÏûÖ§¸¶--\n";
+            continue;
+        }
+    }
+    cout << "-----------ÈÎÒâ¼ü·µ»Ø-----------\n";
+    getch();
+    return;
+}
+
+void User::refund() {
+    string menu = {
+        "                                ----------\n"
+        "                                | ÍË  Æ± |\n"
+        "                                ----------\n"
+        "-----------------------------------------"
+        "---------------------------------\n"};
+    if (tic.size() == 0) {
+        cout << "ÄúµÄÕË»§ÎŞµçÓ°Æ±ĞÅÏ¢\n";
+        cout << "-----------ÈÎÒâ¼ü·µ»Ø-----------\n";
+        getch();
+        return;
+    }
+    system("cls");
+    cout << menu;
+    cout << "Äú¹ºÂòµÄµçÓ°Æ±ÈçÏÂ£º\n";
+    cout << setiosflags(ios::left);
+    cout << setw(6) << "±àºÅ" << setw(16) << "µçÓ°Ãû";
+    cout << setw(12) << "ÈÕÆÚ" << setw(7) << "Ê±¼ä";
+    cout << setw(6) << "³¡´Î" << setw(6) << "¼Û¸ñ";
+    cout << setw(10) << "×ùÎ»" << setw(8) << "×´Ì¬" << endl;
+    for (int i = 0; i < tic.size(); i++) {
+        cout << setw(5) << i + 1;
+        cout << tic[i];
+    }
+    cout << "-----------------------------------------"
+            "---------------------------------\n";
+    int choice;
+    while (true) {
+        cout << "--------------------------------\n";
+        cout << "ÇëÊäÈëÍËÆ±±àºÅ(0ÍË³ö)£º";
+        cin >> choice;
+        if (choice == 0) {
+            cout << "--ÍË³öÍËÆ±--\n";
+            cout << "-----------ÈÎÒâ¼ü·µ»Ø-----------\n";
+            getch();
+            return;
+        }
+        if (choice < 0 || choice > tic.size()) {
+            cout << "±àºÅ²»´æÔÚ\n";
+            continue;
+        }
+        if (tic[--choice].play) {
+            cout << "´ËÆ±ÒÑ¹ıÆÚ£¬²»¿ÉÍË¿î\n";
+            continue;
+        }
+        break;
+    }
+    cout << "È·¶¨ÍËµô´ËÆ±(y/n)?£º";
+    if (deal.yesOrNo()) {
+        vector<Ticket>::iterator tit = tic.begin() + choice;
+        vector<FilmsInfo>::iterator fit = deal.finfo.begin();
+        for (fit; fit < deal.finfo.end(); fit++) {
+            if (fit->year == tit->year && fit->month == tit->month &&
+                fit->day == tit->day && fit->playNum == tit->playNum) {
+                break;
+            }
+        }
+        if (fit == deal.finfo.end()) {
+            cout << "refund find error!\n";
+            return;
+        }
+        fit->rest++;
+        fit->seat[tit->seat[0]][tit->seat[1]] = false;
+        fit->sumSales -= tit->price;
+        cout << "ÍËÆ±³É¹¦£¬ÍË¿î" << tit->price << "£¤\n";
+        tic.erase(tit);
+        deal.filmSave();
+        userSave();
+        cout << "-----------ÈÎÒâ¼ü·µ»Ø-----------\n";
+        getch();
+        return;
+    } else {
+        cout << "--È¡ÏûÍËÆ±--\n";
+        cout << "-----------ÈÎÒâ¼ü·µ»Ø-----------\n";
+        getch();
+        return;
+    }
+}
+
+void User::printTicket(const Ticket& ticket) {
+    string fname = ticket.name;
+    int i = 5 - fname.size() / 8;
+    cout << "------------------------------------------------\n";
+    cout << "ÕıÔÚ´òÓ¡µçÓ°Æ±";
+    deal.wait();
+    cout << "\n------------------------------------------------\n";
+    cout << "_________________________________________________\n";
+    cout << "|                   C C H Ó° ³Ç                 |\n";
+    cout << "|\t\t\t\t\t\t|\n";
+    cout << "| Æ¬Ãû£º" << fname;
+    for (int j = 1; j <= i; j++) {
+        cout << "\t";
+    }
+    cout << "|\n";
+    cout << "| Ó°Ìü£º1ºÅÌü\t\tÊ±¼ä£º";
+    cout << ticket.year << "-" << ticket.month << "-" << ticket.day;
+    cout << " " << ticket.hour << ":" << (ticket.minute == 0 ? "00" : "30")
+         << "\t|\n";
+    cout << "| ×ùÎ»£º" << ticket.seat[0] << " ÅÅ " << ticket.seat[1] << "×ù\t";
+    cout << "×ùÀà£º" << (ticket.isBest ? "×î¼ÑÇø" : "ÆÕÍ¨Çø") << "\t\t|\n";
+    cout << "| Æ±¼Û£º";
+    cout.precision(2);
+    cout.setf(cout.showpoint | ios::fixed);
+    cout << ticket.price << "£¤\t\tÓÃ»§ÀàĞÍ£º";
+    cout << (uinfo.vip ? "VIP" : "ÆÕÍ¨") << "\t\t|\n";
+    cout << "|\t\t\t\t\t\t|\n";
+    cout << "|                  ¹Û Ó° Óä ¿ì                  |\n";
+    cout << "|              | |||| ||||| ||| ||              |\n";
+    cout << "|              x xxxx xxxxx xxx xx              |\n";
+    cout << "|_______________________________________________|\n";
+    cout << "------------------------------------------------\n";
 }

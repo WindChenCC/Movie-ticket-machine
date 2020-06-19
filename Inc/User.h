@@ -1,26 +1,44 @@
 // User.h
-// Created by cch on 2020/5/27.
+// Created by cch on 2020/6/15.
 #pragma once
-#include <string>
 
-#include "InfoDeal.h"
+#include "Deal.h"
 
-class User : public InfoDeal {
+class User {
    private:
-    std::string idName;
-    std::string password;
-    bool vip = false;
-    void pwInput(std::string& str);
+    Deal deal;
+    UserInfo uinfo;
+    std::vector<Ticket> tic;
+
+    void pwInput(std::string& pw);
+    // ø™Õ®ª·‘±
+    bool membership();
+    // œ‘ æ◊˘Œª
+    void showSeat(const FilmsInfo& film);
+    // ±»Ωœ ±º‰
+    bool cmpTime(const Ticket& ticket);
+    // ∂¡»°”√ªß–≈œ¢
+    void userRead(std::string name);
+    // ±£¥Ê”√ªß–≈œ¢
+    void userSave();
+    // ”√ªßµÁ”∞∆±≈≈–Ú
+    static bool tcmp(const Ticket& a, const Ticket& b);
+    // ÷ÿ‘ÿ<<
+    friend std::ostream& operator<<(std::ostream& os, const Ticket& ticket);
 
    public:
-    // ÁîµÂΩ±‰ø°ÊÅØÊòæÁ§∫ Áî®Êà∑Áâà
-    void showInfo();
-    // ÁôªÈôÜ
-    void login();
-    // Ê≥®ÂÜå
+    // π¶ƒ‹—°‘Ò
+    void menuChoice();
+    // œ‘ æø…π∫¬ÚµÁ”∞ ∑µªÿµ⁄“ª∏ˆ¥Û”⁄œµÕ≥ ±º‰µƒµÁ”∞œ¬±Í
+    int showFInfo();
+    // ◊¢≤·
     void signUp();
-    // ËÆ¢Á•®
+    // µ«¬Ω
+    std::string login();
+    // π∫∆±
     void book();
-    // ÈÄÄÁ•®
+    // ÕÀ∆±
     void refund();
+    // ¥Ú”°µÁ”∞∆±
+    void printTicket(const Ticket& ticket);
 };

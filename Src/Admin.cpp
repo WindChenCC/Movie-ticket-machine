@@ -1,314 +1,395 @@
 // Admin.cpp
-// Created by cch on 2020/5/28.
-
+// // Created by cch on 2020/6/16.
 #include "Admin.h"
 
 #include <conio.h>
+#include <io.h>
 #include <windows.h>
 
 #include <algorithm>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
-#include <string>
+#include <map>
+#include <set>
+
+#include "Menu.h"
 using namespace std;
 
-void Admin::del() {
-    int n;
-    int m = static_cast<int>(finfo.size());
+string Admin::strDate(const FilmsInfo& film) {
+    string str;
+    str = to_string(film.year);
+    if (film.month < 10) str += "0";
+    str += ("-" + to_string(film.month));
+    if (film.day < 10) str += "0";
+    str += ("-" + to_string(film.day));
+    return str;
+}
+
+void Admin::menuChoice() {
     char ch;
-    vector<FilmsInfo>::iterator it;
-    showInfo();
+    int choice;
+    Menu menu;
     while (true) {
-        showInfo();
-        it = finfo.begin();
-        cout << "\nËØ∑ËæìÂÖ•ÈúÄË¶ÅÂà†Èô§ÁöÑÁîµÂΩ±ÁºñÂè∑Ôºà0ÈÄÄÂá∫ÔºâÔºö";
-        cin >> n;
-        while (n > m) {
-            cout << "ÁºñÂè∑‰∏çÂ≠òÂú®ÔºåËØ∑ÈáçÊñ∞ËæìÂÖ•";
-            cout << "ËØ∑ËæìÂÖ•ÈúÄË¶ÅÂà†Èô§ÁöÑÁîµÂΩ±ÁºñÂè∑Ôºà0ÈÄÄÂá∫ÔºâÔºö";
-            cin >> n;
-        }
-        if (n == 0) {
-            cout << "ÈÄÄÂá∫Âà†Èô§" << endl;
-            cout << "-----------‰ªªÊÑèÈîÆËøîÂõû-----------";
-            getch();
-            return;
-        }
-        while (true) {
-            cout << "Á°ÆËÆ§Âà†Èô§?(y/n):";
-            cin >> ch;
-            if (ch == 'y') {
-                finfo.erase(it + n - 1);
-                cout << "Âà†Èô§ÊàêÂäüÔºåÊú™‰∏äÊò†ÁöÑÂ∞ÜËá™Âä®ÈÄÄÊ¨æÁªôÁî®Êà∑ÔºåÊòØÂê¶ÁªßÁª≠?(y/n):";
-                break;
-            } else if (ch == 'n') {
-                cout << "ÂèñÊ∂àÂà†Èô§ÔºåÊòØÂê¶ÁªßÁª≠?(y/n):";
-                break;
-            } else {
-                cout << "ËæìÂÖ•ÈîôËØØÔºåËØ∑ÂÜçÊ¨°Á°ÆËÆ§\n";
-                continue;
-            }
-        }
+        menu.adminMenu();
         cin >> ch;
-        if (ch == 'y') {
-            continue;
-        } else {
-            fileSave();
-            cout << "-----------‰ªªÊÑèÈîÆËøîÂõû-----------";
-            getch();
-            break;
+        cin.ignore();
+        choice = ch - 48;
+        switch (choice) {
+            case 0: {
+                return;
+            }
+            case 1: {
+                add();
+                break;
+            }
+            case 2: {
+                showFInfo();
+                cout << "--»Œ“‚º¸∑µªÿ--" << endl;
+                getch();
+                break;
+            }
+            case 3: {
+                change();
+                break;
+            }
+            case 4: {
+                del();
+                break;
+            }
+            case 5: {
+                count();
+                break;
+            }
         }
     }
 }
 
 void Admin::add() {
+    int playNum[8][2]{{0, 0},  {8, 30},  {11, 0}, {13, 30},
+                      {16, 0}, {18, 30}, {21, 0}, {23, 30}};
     string menu = {
         "            ---------\n"
-        "            | Ê∑ª Âä† |\n"
+        "            | ÃÌ º” |\n"
         "            ---------\n"
         "--------------------------------\n"};
     string str;
-    if (finfo.size() == 0) {
-        printf("Ê≤°ÊúâÁîµÂΩ±‰ø°ÊÅØÔºåËØ∑ÂÖàÊ∑ªÂä†\n");
-        return;
-    }
     int choice;
     char ch;
     while (true) {
         system("cls");
         cout << menu;
         FilmsInfo temp;
-        memset(temp.seat, 1, sizeof(temp.seat));
-        cout << "ËØ∑ËæìÂÖ•ÁîµÂΩ±ÂêçÔºö";
-        getline(cin, temp.moviename);
-        cout << "ËØ∑ËæìÂÖ•Êó•Êúü(2020-1-1)Ôºö";
-        cin >> temp.year >> ch >> temp.month >> ch >> temp.day;
+        string sname;
+        vector<FilmsInfo>::iterator it;
+        cout << "«Î ‰»ÎµÁ”∞√˚(0ÕÀ≥ˆ)£∫";
+        getline(cin, sname);
+        if (sname == "0") {
+            cout << "--ÕÀ≥ˆÃÌº”--\n";
+            cout << "-----------»Œ“‚º¸∑µªÿ-----------" << endl;
+            getch();
+            return;
+        }
+        strcpy(temp.name, sname.c_str());
+        cout << "«Î ‰»Î»’∆⁄(2020 1 1)£∫";
+        cin >> temp.year >> temp.month >> temp.day;
         cout << "1. 8:30-10:30   2. 11:00-13:00\n"
                 "3. 13:30-15:30  4. 16:00-18:00\n"
                 "5. 18:30-20:30  6. 21:00-23:00\n"
                 "7. 23:30-1:30\n";
-        cout << "ËØ∑ÈÄâÊã©Êó∂Èó¥ÊÆµÔºö";
+        cout << "«Î—°‘Ò≥°¥Œ£∫";
         cin >> choice;
-        switch (choice) {
-            case 1:
-                temp.hour = 8;
-                temp.minute = 30;
+        temp.playNum = choice;
+        for (it = deal.finfo.begin(); it < deal.finfo.end(); it++) {
+            if (temp.year == it->year && temp.month == it->month &&
+                temp.day == it->day && temp.playNum == it->playNum) {
                 break;
-            case 2:
-                temp.hour = 11;
-                temp.minute = 0;
-                break;
-            case 3:
-                temp.hour = 13;
-                temp.minute = 30;
-                break;
-            case 4:
-                temp.hour = 16;
-                temp.minute = 0;
-                break;
-            case 5:
-                temp.hour = 18;
-                temp.minute = 30;
-                break;
-            case 6:
-                temp.hour = 21;
-                temp.minute = 0;
-                break;
-            case 7:
-                temp.hour = 23;
-                temp.minute = 30;
-                break;
-            default:
-                cout << "ËæìÂÖ•ÈîôËØØ\n";
-                break;
+            }
         }
-        cout << "ËØ∑ËæìÂÖ•Á•®‰ª∑Ôºö";
+        if (it != deal.finfo.end()) {
+            cout << "∏√»’∆⁄µƒµ⁄" << choice << "≥°¥Œ“—”–∆‰À˚µÁ”∞\n";
+            cout << "«Î÷ÿ–¬ÃÌº”\n";
+            cout << "-----------»Œ“‚º¸ºÃ–¯-----------" << endl;
+            getch();
+            cin.ignore();
+            continue;
+        }
+        temp.playNum = choice;
+        temp.hour = playNum[choice][0];
+        temp.minute = playNum[choice][1];
+        cout << "«Î ‰»Î∆±º€£∫";
         cin >> temp.price;
-        cout << "ËØ∑ËæìÂÖ•VIPÊäòÊâ£(7.5)Ôºö";
-        cin >> temp.sale;
-        cin.ignore();
-        cout << "Á°ÆÂÆöÊ∑ªÂä†?(y/n)Ôºö";
-        cin >> ch;
-        cin.ignore();
-        if (ch == 'y') {
-            finfo.push_back(temp);
-            cout << "‰øùÂ≠òÊàêÂäüÔºåÊòØÂê¶ÁªßÁª≠Ê∑ªÂä†?(y/n)Ôºö";
+        cout << "«Î ‰»ÎVIP’€ø€(7.5)£∫";
+        cin >> temp.discount;
+        cout << "»∑∂®ÃÌº”?(y/n)£∫";
+        if (deal.yesOrNo()) {
+            deal.finfo.push_back(temp);
+            cout << "±£¥Ê≥…π¶£¨ «∑ÒºÃ–¯ÃÌº”?(y/n)£∫";
         } else {
-            cout << "ÂèñÊ∂à‰øùÂ≠òÔºåÊòØÂê¶ÁªßÁª≠Ê∑ªÂä†?(y/n)Ôºö";
+            cout << "»°œ˚±£¥Ê£¨ «∑ÒºÃ–¯ÃÌº”?(y/n)£∫";
         }
-        cin >> ch;
-        cin.ignore();
-        if (ch == 'y') {
+        if (deal.yesOrNo()) {
             continue;
         } else {
-            sort(finfo.begin(), finfo.end(), cmp);
-            fileSave();
-            cout << "-----------‰ªªÊÑèÈîÆËøîÂõû-----------";
+            deal.filmSave();
+            cout << "-----------»Œ“‚º¸∑µªÿ-----------" << endl;
             getch();
-            break;
+            return;
         }
     }
 }
 
-void Admin::showInfo() {
-    string str;
-    int size = static_cast<int>(finfo.size());
+void Admin::showFInfo() {
     system("cls");
-    printf("                               ----------\n");
-    printf("                               | ‰ø°  ÊÅØ |\n");
-    printf("                               ----------\n");
-    printf(
-        "----------------------------------------------------------------------"
-        "---\n");
-    if (finfo.size() == 0) {
-        printf("Ê≤°ÊúâÁîµÂΩ±‰ø°ÊÅØÔºåËØ∑ÂÖàÊ∑ªÂä†\n");
-        printf("-----------‰ªªÊÑèÈîÆËøîÂõû-----------");
-        getch();
-        return;
-    }
-    printf("%-8s%-20s\t", "ÁºñÂè∑", "ÁîµÂΩ±Âêç");
-    printf("%-13s%-10s", "Êó•Êúü", "Êó∂Èó¥");
-    printf("%-10s%-10s", "‰ª∑Ê†º", "VIPÊäòÊâ£");
-    printf("%-10s%-10s\n", "Ââ©‰Ωô", "Áä∂ÊÄÅ");
-    for (int i = 0; i < size; i++) {
-        str = to_string(i + 1) + ".";
-        printf("%-5s", str.c_str());
-        str = "„Ää" + finfo[i].moviename + "„Äã";
-        printf("%-20s\t", str.c_str());
-        str = to_string(finfo[i].year) + "-" + to_string(finfo[i].month) + "-" +
-              to_string(finfo[i].day);
-        printf("%-11s", str.c_str());
-        str = to_string(finfo[i].hour) + ":";
-        if (finfo[i].minute == 0) {
-            str += "00";
-        } else {
-            str += to_string(finfo[i].minute);
-        }
-        printf("%-8s", str.c_str());
-        printf("%-8.1f", finfo[i].price);
-        printf("%-8.1f", finfo[i].sale);
-        printf("%-8d", finfo[i].rest);
-        if (finfo[i].play) {
-            printf("%s\n", "Â∑≤‰∏äÊò†");
-        } else {
-            printf("%s\n", "Êú™‰∏äÊò†");
-        }
-    }
-    printf(
-        "----------------------------------------------------------------------"
-        "---\n");
+    deal.showFInfo();
 }
 
 void Admin::change() {
-    string menu = {"\n--------------------------------\n"};
+    int playNum[8][2]{{0, 0},  {8, 30},  {11, 0}, {13, 30},
+                      {16, 0}, {18, 30}, {21, 0}, {23, 30}};
     int choice;
     int n;
-    int m = static_cast<int>(finfo.size());
-    char ch;
-    vector<FilmsInfo>::iterator it;
-    showInfo();
-    it = finfo.begin();
-    cout << menu;
-    cout << "ËØ∑ËæìÂÖ•‰øÆÊîπÁöÑÁºñÂè∑Ôºà0ÈÄÄÂá∫ÔºâÔºö";
-    cin >> n;
-    while (n > m) {
-        cout << "ÁºñÂè∑‰∏çÂ≠òÂú®ÔºåËØ∑ÈáçÊñ∞ËæìÂÖ•";
-        cout << "ËØ∑ËæìÂÖ•ÈúÄË¶ÅÂà†Èô§ÁöÑÁîµÂΩ±ÁºñÂè∑Ôºà0ÈÄÄÂá∫ÔºâÔºö";
-        cin >> n;
-    }
-    if (n == 0) {
-        cout << "ÈÄÄÂá∫‰øÆÊîπ" << endl;
-        cout << "-----------‰ªªÊÑèÈîÆËøîÂõû-----------\n";
-        getch();
-        return;
-    }
-    it = it + n - 1;
-    FilmsInfo temp = *it;
+    int m = static_cast<int>(deal.finfo.size());
     while (true) {
-        cout << "1. ÁîµÂΩ±Âêç  2. Êó•Êúü" << endl;
-        cout << "3. Êó∂Èó¥    4. ‰ª∑Ê†º" << endl;
-        cout << "5. ÊäòÊâ£" << endl;
-        cout << "ËØ∑ÈÄâÊã©‰øÆÊîπÁöÑ‰ø°ÊÅØÔºö";
+        system("cls");
+        showFInfo();
+        cout << "\n--------------------------------\n";
+        cout << "«Î ‰»Î–ﬁ∏ƒµƒ±‡∫≈(0ÕÀ≥ˆ)£∫";
+        cin >> n;
+        while (n > m) {
+            cout << "±‡∫≈≤ª¥Ê‘⁄£¨«Î÷ÿ–¬ ‰»Î";
+            cout << "«Î ‰»Î–Ë“™…æ≥˝µƒµÁ”∞±‡∫≈£®0ÕÀ≥ˆ£©£∫";
+            cin >> n;
+        }
+        if (n == 0) {
+            cout << "--ÕÀ≥ˆ–ﬁ∏ƒ--" << endl;
+            cout << "-----------»Œ“‚º¸∑µªÿ-----------\n";
+            getch();
+            return;
+        }
+        if (deal.finfo[--n].rest != 100) {
+            cout << "¥ÀµÁ”∞“— €≥ˆµÁ”∞∆±≤ªø…–ﬁ∏ƒ\n";
+            cout << "-----------»Œ“‚º¸ºÃ–¯-----------\n";
+            getch();
+            continue;
+        }
+        FilmsInfo temp = deal.finfo[n];
+        cout << "1. µÁ”∞√˚  2. »’∆⁄" << endl;
+        cout << "3.  ±º‰    4. º€∏Ò" << endl;
+        cout << "5. ’€ø€" << endl;
+        cout << "«Î—°‘Ò–ﬁ∏ƒµƒ–≈œ¢£∫";
         cin >> choice;
         switch (choice) {
             case 1:
-                cout << "ËØ∑ËæìÂÖ•ÁîµÂΩ±ÂêçÔºö";
+                cout << "«Î ‰»ÎµÁ”∞√˚£∫";
                 cin.ignore();
-                getline(cin, temp.moviename);
+                cin >> temp.name;
                 break;
             case 2:
-                cout << "ËØ∑ËæìÂÖ•Êó•Êúü(2020-1-1)Ôºö";
-                cin >> temp.year >> ch >> temp.month >> ch >> temp.day;
+                cout << "«Î ‰»Î»’∆⁄(2020 1 1)£∫";
+                cin >> temp.year >> temp.month >> temp.day;
                 break;
             case 3:
-                cout << "1. 8:30-10:30   2. 11:00-13:00\n"
+                cout << "1. 08:30-10:30  2. 11:00-13:00\n"
                         "3. 13:30-15:30  4. 16:00-18:00\n"
                         "5. 18:30-20:30  6. 21:00-23:00\n"
-                        "7. 23:30-1:30\n";
-                cout << "ËØ∑ÈÄâÊã©Êó∂Èó¥ÊÆµÔºö";
+                        "7. 23:30-01:30\n";
+                cout << "«Î—°‘Ò≥°¥Œ£∫";
                 int choice2;
                 cin >> choice2;
                 cin.ignore();
-                switch (choice2) {
-                    case 1:
-                        temp.hour = 8;
-                        temp.minute = 30;
-                        break;
-                    case 2:
-                        temp.hour = 11;
-                        temp.minute = 0;
-                        break;
-                    case 3:
-                        temp.hour = 13;
-                        temp.minute = 30;
-                        break;
-                    case 4:
-                        temp.hour = 16;
-                        temp.minute = 0;
-                        break;
-                    case 5:
-                        temp.hour = 18;
-                        temp.minute = 30;
-                        break;
-                    case 6:
-                        temp.hour = 21;
-                        temp.minute = 0;
-                        break;
-                    case 7:
-                        temp.hour = 23;
-                        temp.minute = 30;
-                        break;
-                    default:
-                        cout << "ËæìÂÖ•ÈîôËØØ\n";
-                        break;
-                }
+                temp.playNum = choice2;
+                temp.hour = playNum[choice2][0];
+                temp.minute = playNum[choice2][1];
             case 4:
-                cout << "ËØ∑ËæìÂÖ•‰ª∑Ê†ºÔºö";
+                cout << "«Î ‰»Îº€∏Ò£∫";
                 cin >> temp.price;
                 break;
             case 5:
-                cout << "ËØ∑ËæìÂÖ•ÊäòÊâ£(7.5)Ôºö";
-                cin >> temp.sale;
+                cout << "«Î ‰»ÎVIP’€ø€(7.5)£∫";
+                cin >> temp.discount;
                 break;
+            default:
+                cout << "—°‘Ò¥ÌŒÛ£°" << endl;
+                continue;
         }
-        cout << "Á°ÆËÆ§‰øÆÊîπ?(y/n)Ôºö";
-        cin >> ch;
-        cin.ignore();
-        if (ch == 'y') {
-            *it = temp;
-            cout << "‰øÆÊîπÊàêÂäü" << endl;
+        cout << "»∑»œ–ﬁ∏ƒ?(y/n)£∫";
+        if (deal.yesOrNo()) {
+            deal.finfo[n] = temp;
         } else {
-            cout << "ÂèñÊ∂à‰øÆÊîπ" << endl;
+            cout << "--»°œ˚–ﬁ∏ƒ--" << endl;
         }
-        cout << "ÊòØÂê¶ÁªßÁª≠‰øÆÊîπËØ•ÁºñÂè∑ÂÖ∂‰ªñ‰ø°ÊÅØ?(y/n)Ôºö";
-        cin >> ch;
-        cin.ignore();
-        if (ch == 'y') {
+        cout << " «∑ÒºÃ–¯–ﬁ∏ƒ?(y/n)£∫";
+        if (deal.yesOrNo()) {
             continue;
         } else {
-            sort(finfo.begin(), finfo.end(), cmp);
-            fileSave();
-            showInfo();
-            cout << "-----------‰ªªÊÑèÈîÆËøîÂõû-----------";
+            deal.filmSave();
+            cout << "-----------»Œ“‚º¸∑µªÿ-----------" << endl;
+            getch();
+            return;
+        }
+    }
+}
+
+void Admin::del() {
+    int n;
+    int m = static_cast<int>(deal.finfo.size());
+    vector<FilmsInfo>::iterator it;
+    while (true) {
+        system("cls");
+        it = deal.finfo.begin();
+        showFInfo();
+        cout << "\n--------------------------------\n";
+        cout << "«Î ‰»Î–Ë“™…æ≥˝µƒµÁ”∞±‡∫≈(0ÕÀ≥ˆ)£∫";
+        cin >> n;
+        while (n > m) {
+            cout << "±‡∫≈≤ª¥Ê‘⁄£¨«Î÷ÿ–¬ ‰»Î\n";
+            cout << "«Î ‰»Î–Ë“™…æ≥˝µƒµÁ”∞±‡∫≈£®0ÕÀ≥ˆ£©£∫";
+            cin >> n;
+        }
+        if (n == 0) {
+            cout << "--ÕÀ≥ˆ…æ≥˝--" << endl;
+            cout << "-----------»Œ“‚º¸∑µªÿ-----------" << endl;
+            getch();
+            return;
+        }
+        n--;
+        if (((it + n)->rest != 100) && (it + n)->play == 0) {
+            cout << "∏√µÁ”∞Œ¥…œ”≥«““— €≥ˆ∆±£¨≤ªø……æ≥˝\n";
+            cout << "«Î¡™œµ”√ªßΩ¯––ÕÀ∆±≤Ÿ◊˜∫Û‘Ÿ…æ≥˝\n";
+            Sleep(500);
+            cout << " «∑ÒºÃ–¯…æ≥˝∆‰À˚µÁ”∞(y/n)?£∫";
+            if (deal.yesOrNo()) {
+                continue;
+            } else {
+                cout << "--ÕÀ≥ˆ…æ≥˝--" << endl;
+                cout << "-----------»Œ“‚º¸∑µªÿ-----------" << endl;
+                getch();
+                return;
+            }
+        }
+        cout << "»∑»œ…æ≥˝?(y/n):";
+        if (deal.yesOrNo()) {
+            deal.finfo.erase(it + n);
+            deal.filmSave();
+            cout << "…æ≥˝≥…π¶£¨ «∑ÒºÃ–¯?(y/n):";
+        } else {
+            cout << "»°œ˚…æ≥˝£¨ «∑ÒºÃ–¯?(y/n):";
+        }
+        if (deal.yesOrNo()) {
+            continue;
+        } else {
+            cout << "-----------»Œ“‚º¸∑µªÿ-----------" << endl;
+            getch();
+            return;
+        }
+    }
+}
+
+void Admin::count() {
+    if (deal.finfo.size() == 0) {
+        cout << "√ª”–µÁ”∞–≈œ¢£¨Œﬁ∑®Õ≥º∆\n";
+        cout << "-----------»Œ“‚º¸∑µªÿ-----------" << endl;
+        getch();
+        return;
+    }
+    string menu = {
+        "                                ----------\n"
+        "                                | Õ≥  º∆ |\n"
+        "                                ----------\n"
+        "-----------------------------------------"
+        "---------------------------------\n"};
+    map<int, string> mpnum{{1, "08:30-10:30"}, {2, "11:00-13:00"},
+                           {3, "13:30-15:30"}, {4, "16:00-18:00"},
+                           {5, "18:30-20:30"}, {6, "21:00-23:00"},
+                           {7, "23:30-01:30"}};
+    map<int, string> mdate;
+
+    set<string> dateSet;
+    set<string>::iterator sit;
+    vector<FilmsInfo>::iterator fit, fit2;
+    int i = 1;
+    for (fit = deal.finfo.begin(); fit < deal.finfo.end(); fit++) {
+        dateSet.insert(strDate(*fit));
+    }
+    for (sit = dateSet.begin(); sit != dateSet.end(); sit++) {
+        mdate[i] = *sit;
+    }
+    while (true) {
+        system("cls");
+        cout << menu;
+        cout << "ø…Õ≥º∆»’∆⁄”–£∫\n";
+        for (i = 1; i <= mdate.size(); i++) {
+            cout << i << ". " << mdate[i] << endl;
+        }
+        int choice;
+        while (true) {
+            cout << "«Î—°‘Ò»’∆⁄(0ÕÀ≥ˆ)£∫";
+            cin >> choice;
+            if (choice == 0) {
+                cout << "--ÕÀ≥ˆÕ≥º∆--\n";
+                cout << "-----------»Œ“‚º¸∑µªÿ-----------" << endl;
+                getch();
+                return;
+            }
+            if (choice < 0 || choice > mdate.size()) {
+                cout << "»’∆⁄≤ª¥Ê‘⁄\n";
+                cout << "-----------»Œ“‚º¸ºÃ–¯-----------" << endl;
+                getch();
+                continue;
+            }
+            break;
+        }
+        cout << "-----------------------------------------"
+                "---------------------------------\n";
+        cout << mdate[choice] << "Õ≥º∆Ω·π˚»Áœ¬£∫\n";
+        string str = mdate[choice];
+        fit = deal.finfo.begin();
+        for (fit; fit != deal.finfo.end(); fit++) {
+            if (strDate(*fit) == str) {
+                break;
+            }
+        }
+        fit2 = fit;
+        for (i = 1; i <= 7; i++) {
+            cout << "µ⁄" << i << "≥°¥Œ " << mpnum[i] << " ";
+            if ((fit2 != deal.finfo.end()) && (strDate(*fit) == str) &&
+                (fit->playNum == i)) {
+                cout << "µÁ”∞°∂" << fit->name << "°∑\n";
+                cout << "“— €£∫" << 100 - fit->rest;
+                cout << "  ◊‹º€£∫" << fit->sumSales << "£§\n\n";
+                fit++;
+            } else {
+                cout << "ŒﬁµÁ”∞\n\n";
+            }
+        }
+        cout << "--------------------------------\n";
+        cout << " «∑Òµº≥ˆ(y/n)?£∫";
+        if (deal.yesOrNo()) {
+            string path;
+            path = "statistics\\" + str + ".txt";
+            ofstream oFile{path, ios::out | ios::trunc};
+            for (i = 1; i <= 7; i++) {
+                oFile << "µ⁄" << i << "≥°¥Œ " << mpnum[i] << " ";
+                if ((fit2 != deal.finfo.end()) && (strDate(*fit2) == str) &&
+                    (fit2->playNum == i)) {
+                    oFile << "µÁ”∞°∂" << fit2->name << "°∑\n";
+                    oFile << "“— €£∫" << 100 - fit2->rest;
+                    oFile << " ◊‹º€£∫" << fit2->sumSales << "£§\n\n";
+                    fit2++;
+                } else {
+                    oFile << "ŒﬁµÁ”∞\n\n";
+                }
+            }
+            oFile.close();
+            cout << "“—≥…π¶µº≥ˆµΩ" << str << ".txt\n";
+        }
+        cout << " «∑ÒÕ≥º∆∆‰À˚»’∆⁄(y/n)?£∫";
+        if (deal.yesOrNo()) {
+            continue;
+        } else {
+            cout << "--ÕÀ≥ˆÕ≥º∆--\n";
+            cout << "-----------»Œ“‚º¸∑µªÿ-----------" << endl;
             getch();
             return;
         }

@@ -1,16 +1,26 @@
 // Admin.h
-// Created by cch on 2020/5/27.
+// Created by cch on 2020/6/15.
 #pragma once
-#include "InfoDeal.h"
+#include <vector>
 
-class Admin : public InfoDeal {
+#include "Deal.h"
+
+class Admin {
+   private:
+    Deal deal;
+    // 获取string电影日期
+    std::string strDate(const FilmsInfo& film);
+
    public:
-    // 鍒犻櫎
-    void del();
-    // 娣诲姞
+    void menuChoice();
+    // 添加
     void add();
-    // 淇敼
+    // 显示
+    void showFInfo();
+    // 修改
     void change();
-    // 鏄剧ず鐢靛奖淇℃伅 绠＄悊鍛樼増
-    void showInfo();
+    // 删除
+    void del();
+    // 统计
+    void count();
 };
