@@ -21,6 +21,7 @@ int enterChoice() {
 
 int main() {
     system("chcp 936");
+    system("mode con cols=78 lines=35");
     system("cls");
     if (_access("users", 0) == -1) {
         system("md users");
@@ -44,7 +45,7 @@ int main() {
             case 1: {
                 user = new User;
                 user->showFInfo();
-                cout << "--任意键返回--" << endl;
+                cout << "-----------任意键返回-----------\n";
                 getch();
                 delete user;
                 break;

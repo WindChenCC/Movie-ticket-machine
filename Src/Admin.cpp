@@ -19,10 +19,12 @@ using namespace std;
 string Admin::strDate(const FilmsInfo& film) {
     string str;
     str = to_string(film.year);
+    str += "-";
     if (film.month < 10) str += "0";
-    str += ("-" + to_string(film.month));
+    str += to_string(film.month);
+    str += "-";
     if (film.day < 10) str += "0";
-    str += ("-" + to_string(film.day));
+    str += to_string(film.day);
     return str;
 }
 
@@ -45,7 +47,7 @@ void Admin::menuChoice() {
             }
             case 2: {
                 showFInfo();
-                cout << "--任意键返回--" << endl;
+                cout << "-----------任意键返回-----------\n";
                 getch();
                 break;
             }
@@ -342,7 +344,7 @@ void Admin::count() {
         }
         cout << "-----------------------------------------"
                 "---------------------------------\n";
-        cout << mdate[choice] << "统计结果如下：\n";
+        cout << mdate[choice] << "统计结果如下：\n\n";
         string str = mdate[choice];
         fit = deal.finfo.begin();
         for (fit; fit != deal.finfo.end(); fit++) {

@@ -7,8 +7,8 @@
 class User {
    private:
     Deal deal;
-    UserInfo uinfo;
-    std::vector<Ticket> tic;
+    UserInfo uinfo;           // 用户信息
+    std::vector<Ticket> tic;  // 票容器
 
     void pwInput(std::string& pw);
     // 开通会员
@@ -23,7 +23,7 @@ class User {
     void userSave();
     // 用户电影票排序
     static bool tcmp(const Ticket& a, const Ticket& b);
-    // 重载<<
+    // 重载<< 输出票信息
     friend std::ostream& operator<<(std::ostream& os, const Ticket& ticket);
 
    public:

@@ -15,7 +15,7 @@ class Deal {
     // 析构函数保存电影信息
     ~Deal();
 
-    // 重载<<
+    // 重载<< 输出电影信息
     friend std::ostream& operator<<(std::ostream& os, const FilmsInfo& film);
     // 电影排序
     static bool fcmp(const FilmsInfo& a, const FilmsInfo& b);

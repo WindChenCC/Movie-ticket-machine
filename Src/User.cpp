@@ -237,9 +237,8 @@ int User::showFInfo() {
     }
     system("cls");
     if (begin == size) {
-        cout << "当前没有可购买电影\n";
-        cout << "-----------任意键返回-----------\n";
-        getch();
+        cout << "--------------------------------\n";
+        cout << "       当前没有可购买电影\n";
         return -1;
     }
     deal.showFInfo(begin);
@@ -271,20 +270,20 @@ void User::signUp() {
         if (id == "admin") {
             system("cls");
             cout << menu;
-            cout << " 该用户名不可注册，" << warning;
+            cout << "   该用户名不可注册，" << warning;
             continue;
         }
         if (id.find(' ') != string::npos) {
             system("cls");
             cout << menu;
-            cout << " 用户名不可包含空格，" << warning;
+            cout << "  用户名不可包含空格，" << warning;
             continue;
         }
         path = "users\\" + id + ".dat";
         if (_access(path.c_str(), 0) == 0) {
             system("cls");
             cout << menu;
-            cout << " 该用户名已存在，" << warning;
+            cout << "   该用户名已存在，" << warning;
             continue;
         }
         cout << "（密码6位及以上且不含空格）\n";
@@ -293,13 +292,13 @@ void User::signUp() {
         if (pw.find(' ') != string::npos) {
             system("cls");
             cout << menu;
-            cout << "  密码不可包含空格，" << warning;
+            cout << "    密码不可包含空格，" << warning;
             continue;
         }
         if (pw.size() < 6) {
             system("cls");
             cout << menu;
-            cout << " 密码必须6位及以上，" << warning;
+            cout << "   密码必须6位及以上，" << warning;
             continue;
         }
         cout << "请再次输入密码：";  // 密码确认
