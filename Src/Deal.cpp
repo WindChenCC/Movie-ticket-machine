@@ -153,7 +153,6 @@ void Deal::filmRead() {
     FilmsInfo temp;
     ifstream iFile{"films\\films.dat", ios::binary | ios::in};
     if (!iFile) {
-        cout << "read error!\n";
         return;
     }
     iFile.read((char*)&temp, sizeof(FilmsInfo));

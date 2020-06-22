@@ -4,8 +4,12 @@
 
 class Menu {
    public:
-    void cover();      // 欢迎界面
-    void mainMenu();   // 主菜单
-    void userMenu();   // 用户界面
-    void adminMenu();  // 管理界面
+    // 欢迎界面
+    void cover();
+    // 主菜单
+    void mainMenu();
+    // 用户界面
+    void userMenu();
+    // 管理界面
+    void adminMenu();
 };

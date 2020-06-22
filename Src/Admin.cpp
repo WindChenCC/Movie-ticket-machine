@@ -116,7 +116,6 @@ void Admin::add() {
             cin.ignore();
             continue;
         }
-        temp.playNum = choice;
         temp.hour = playNum[choice][0];
         temp.minute = playNum[choice][1];
         cout << "请输入票价：";
@@ -357,7 +356,7 @@ void Admin::count() {
         fit2 = fit;
         for (i = 1; i <= 7; i++) {
             cout << "第" << i << "场次 " << mpnum[i] << " ";
-            if ((fit2 != deal.finfo.end()) && (strDate(*fit) == str) &&
+            if ((fit != deal.finfo.end()) && (strDate(*fit) == str) &&
                 (fit->playNum == i)) {
                 cout << "电影《" << fit->name << "》\n";
                 cout << "已售：" << 100 - fit->rest;

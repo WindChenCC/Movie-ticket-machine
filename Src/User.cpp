@@ -393,26 +393,11 @@ string User::login() {
 
 void User::book() {
     int x, y;
-    int seat[2]{-1, -1};
     int begin;
     int choice;
     int size = static_cast<int>(deal.finfo.size());
     bool isBest = false;
     double ticPrice;
-
-    // for (begin = 0; begin < size; begin++) {
-    //     if (deal.finfo[begin].play == false) {
-    //         break;
-    //     }
-    // }
-    // system("cls");
-    // if (begin == size) {
-    //     cout << "当前没有可购买电影\n";
-    //     cout << "-----------任意键返回-----------\n";
-    //     getch();
-    //     return;
-    // }
-    // deal.showFInfo(begin);
     begin = showFInfo();
     if (begin == -1) return;
     while (true) {
